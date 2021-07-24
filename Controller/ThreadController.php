@@ -376,8 +376,6 @@ class ThreadController extends AbstractController
      * @param Request $request Current request
      * @param string  $id      Id of the thread
      *
-     * @return View
-     *
      * @todo Add support page/pagesize/sorting/tree-depth parameters
      */
     public function getThreadCommentsAction(Request $request, $id)
@@ -398,12 +396,11 @@ class ThreadController extends AbstractController
             // Validate the entity
             $errors = $this->get('validator')->validate($thread, null, ['NewThread']);
             if (count($errors) > 0) {
-                $view = View::create()
-                    ->setStatusCode(Response::HTTP_BAD_REQUEST)
-                    ->setData(['errors' => $errors])
-                    ->setTemplate('@FOSComment/Thread/errors.html.twig');
-
-                return $this->getViewHandler()->handle($view);
+                return $this->render(
+                    '@FOSComment/Thread/errors.html.twig',
+                    ['errors' => $errors],
+                    new Response(null, Response::HTTP_BAD_REQUEST)
+                );
             }
 
             // Decode the permalink for cleaner storage (it is encoded on the client side)
@@ -431,16 +428,6 @@ class ThreadController extends AbstractController
                 break;
         }
 
-        $view = View::create()
-            ->setData([
-                'comments' => $comments,
-                'displayDepth' => $displayDepth,
-                'sorter' => 'date',
-                'thread' => $thread,
-                'view' => $viewMode,
-            ])
-            ->setTemplate('@FOSComment/Thread/comments.html.twig');
-
         // Register a special handler for RSS. Only available on this route.
         if ('rss' === $request->getRequestFormat()) {
             $templatingHandler = function ($handler, $view, $request) {
@@ -452,7 +439,16 @@ class ThreadController extends AbstractController
             $this->get('fos_rest.view_handler')->registerHandler('rss', $templatingHandler);
         }
 
-        return $this->getViewHandler()->handle($view);
+        return $this->render(
+            '@FOSComment/Thread/comments.html.twig',
+            [
+                'comments' => $comments,
+                'displayDepth' => $displayDepth,
+                'sorter' => 'date',
+                'thread' => $thread,
+                'view' => $viewMode,
+            ]
+        );
     }
 
     /**

@@ -11,7 +11,7 @@
 
 namespace FOS\CommentBundle\Tests\Functional\Bundle\CommentBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @author Tim Nagel <tim@nagel.com.au>
  */
-class CommentController extends Controller
+class CommentController extends AbstractController
 {
     public function asyncAction($id)
     {
