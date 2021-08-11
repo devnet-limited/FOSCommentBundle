@@ -63,7 +63,11 @@
                     complete(response.responseText, response.status);
                 }
             };
-            $.post(url, data, success).fail(wrappedErrorCallback).always(wrappedCompleteCallback);
+            $.post(url, data).fail(wrappedErrorCallback)
+            .then(function (data, textStatus, jqXHR) {
+                var redirectLocation = jqXHR.getResponseHeader('Location');
+                return $.get(redirectLocation, success).fail(wrappedErrorCallback).always(wrappedCompleteCallback);
+            });
         },
 
         /**
